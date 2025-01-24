@@ -2,13 +2,14 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './user/entities/user';
+import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
-import { Role } from './user/entities/role';
-import { Permission } from './user/entities/permission';
+import { Role } from './user/entities/role.entity';
+import { Permission } from './user/entities/permission.entity';
 import { RedisModule } from './redis/redis.module';
 import { EmailModule } from './email/email.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -39,6 +40,18 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: 'src/.env',
+    }),
+    JwtModule.registerAsync({
+      global: true,
+      useFactory(configService: ConfigService) {
+        return {
+          secret: configService.get('JWT_SECRET'),
+          signOptions: {
+            expiresIn: configService.get('JWT_ACCESS_TOKEN_EXPIRES_TIME'),
+          },
+        };
+      },
+      inject: [ConfigService],
     }),
   ],
   controllers: [AppController],

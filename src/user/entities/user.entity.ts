@@ -7,7 +7,7 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import { Role } from './role';
+import { Role } from './role.entity';
 
 @Entity({
   name: 'users',
@@ -27,7 +27,6 @@ export class User {
 
   @Column({
     length: 50,
-    select: false,
     comment: '密码',
   })
   password: string;
