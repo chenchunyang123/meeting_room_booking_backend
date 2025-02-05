@@ -41,6 +41,7 @@ export class User {
   @Column({
     length: 50,
     nullable: true,
+    unique: true,
     comment: '邮箱',
   })
   email: string;

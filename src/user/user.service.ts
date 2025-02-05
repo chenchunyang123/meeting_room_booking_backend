@@ -119,6 +119,7 @@ export class UserService {
     return {
       id: user.id,
       username: user.username,
+      email: user.email,
       isAdmin: user.isAdmin,
       roles: user.roles.map((role) => role.name),
       permissions: user.roles.reduce((arr, item) => {
@@ -136,7 +137,7 @@ export class UserService {
     return await this.userRepository.findOneBy({ id: userId });
   }
 
-  async updatePassword(userId: number, passwordDto: UpdateUserPasswordDto) {
+  async updatePassword(passwordDto: UpdateUserPasswordDto) {
     const captcha = await this.redisService.get(
       `update_password_captcha_${passwordDto.email}`,
     );
@@ -149,7 +150,9 @@ export class UserService {
       throw new BadRequestException('验证码错误');
     }
 
-    const user = await this.userRepository.findOneBy({ id: userId });
+    const user = await this.userRepository.findOneBy({
+      email: passwordDto.email,
+    });
 
     user.password = md5(passwordDto.password);
 
