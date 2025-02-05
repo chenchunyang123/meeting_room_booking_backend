@@ -15,6 +15,7 @@ import { LoginGuard } from './login.guard';
 import { PermissionGuard } from './permission.guard';
 import { FormatResponseInterceptor } from './format-response.interceptor';
 import { ValidationPipe } from '@nestjs/common';
+import { InvokeRecordInterceptor } from './invoke-record.interceptor';
 
 @Module({
   imports: [
@@ -73,6 +74,10 @@ import { ValidationPipe } from '@nestjs/common';
     {
       provide: APP_INTERCEPTOR,
       useClass: FormatResponseInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: InvokeRecordInterceptor,
     },
     {
       provide: APP_PIPE,
