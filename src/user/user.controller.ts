@@ -1,7 +1,10 @@
 import {
+  BadRequestException,
   Body,
   Controller,
+  DefaultValuePipe,
   Get,
+  ParseIntPipe,
   Post,
   Query,
   UnauthorizedException,
@@ -18,6 +21,7 @@ import { RequireLogin, UserInfo } from 'src/custom.decorator';
 import { UserDetailVo } from './vo/user-info.vo';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { generateParseIntPipe } from 'src/utils';
 
 @Controller('user')
 export class UserController {
@@ -164,5 +168,34 @@ export class UserController {
     @Body() updateUserDto: UpdateUserDto,
   ) {
     return await this.userService.update(userId, updateUserDto);
+  }
+
+  @Get('freeze')
+  async freezeUser(@Query('id') userId: number) {
+    await this.userService.freezeUserById(userId);
+    return '冻结成功';
+  }
+
+  @Get('list')
+  async getUserList(
+    @Query('pageNum', new DefaultValuePipe(1), generateParseIntPipe('pageNum'))
+    pageNum: number,
+    @Query(
+      'pageSize',
+      new DefaultValuePipe(10),
+      generateParseIntPipe('pageSize'),
+    )
+    pageSize: number,
+    @Query('username') username: string,
+    @Query('nickName') nickName: string,
+    @Query('email') email: string,
+  ) {
+    return await this.userService.findUsers({
+      username,
+      nickName,
+      email,
+      pageNum,
+      pageSize,
+    });
   }
 }
