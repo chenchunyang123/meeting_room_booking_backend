@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   DefaultValuePipe,
@@ -7,6 +8,8 @@ import {
   Post,
   Query,
   UnauthorizedException,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -29,6 +32,9 @@ import { UserService } from './user.service';
 import { LoginUserVo } from './vo/login-user.vo';
 import { UserDetailVo } from './vo/user-info.vo';
 import { RefreshTokenVo } from './vo/refresh-token.vo';
+import { FileInterceptor } from '@nestjs/platform-express';
+import * as path from 'path';
+import { storage } from 'src/my-file-storage';
 
 @ApiTags('用户管理模块')
 @Controller('user')
@@ -364,5 +370,30 @@ export class UserController {
       pageNum,
       pageSize,
     });
+  }
+
+  @Post('upload')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      dest: 'uploads',
+      storage,
+      limits: {
+        fileSize: 1024 * 1024 * 3,
+      },
+      fileFilter: (req, file, callback) => {
+        const extName = path.extname(file.originalname);
+        if (['.png', '.jpg', '.jpeg', '.gif'].includes(extName)) {
+          callback(null, true);
+        } else {
+          callback(
+            new BadRequestException('文件格式错误，只能上传图片'),
+            false,
+          );
+        }
+      },
+    }),
+  )
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    return file.path;
   }
 }
