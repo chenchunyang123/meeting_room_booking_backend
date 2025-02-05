@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class UpdateUserDto {
+export class RefreshTokenVo {
   @ApiProperty()
-  headPic: string;
+  access_token: string;
 
   @ApiProperty()
-  nickName: string;
+  refresh_token: string;
 }
