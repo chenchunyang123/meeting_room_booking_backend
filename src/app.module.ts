@@ -17,7 +17,8 @@ import { FormatResponseInterceptor } from './format-response.interceptor';
 import { ValidationPipe } from '@nestjs/common';
 import { InvokeRecordInterceptor } from './invoke-record.interceptor';
 import { CustomExceptionFilter } from './custom-exception.filter';
-
+import { MeetingRoomModule } from './meeting-room/meeting-room.module';
+import { MeetingRoom } from './meeting-room/entities/meeting-room.entity';
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
@@ -29,7 +30,7 @@ import { CustomExceptionFilter } from './custom-exception.filter';
           username: configService.get('MYSQL_SERVER_USER'),
           password: configService.get('MYSQL_SERVER_PASSWORD'),
           database: configService.get('MYSQL_SERVER_DATABASE'),
-          entities: [User, Role, Permission],
+          entities: [User, Role, Permission, MeetingRoom],
           synchronize: true,
           logging: true,
           poolSize: 10,
@@ -60,6 +61,7 @@ import { CustomExceptionFilter } from './custom-exception.filter';
       },
       inject: [ConfigService],
     }),
+    MeetingRoomModule,
   ],
   controllers: [AppController],
   providers: [
