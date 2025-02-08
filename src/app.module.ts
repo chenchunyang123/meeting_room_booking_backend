@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -19,6 +19,8 @@ import { InvokeRecordInterceptor } from './invoke-record.interceptor';
 import { CustomExceptionFilter } from './custom-exception.filter';
 import { MeetingRoomModule } from './meeting-room/meeting-room.module';
 import { MeetingRoom } from './meeting-room/entities/meeting-room.entity';
+import { BookingModule } from './booking/booking.module';
+import { Booking } from './booking/entities/booking.entity';
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
@@ -30,9 +32,9 @@ import { MeetingRoom } from './meeting-room/entities/meeting-room.entity';
           username: configService.get('MYSQL_SERVER_USER'),
           password: configService.get('MYSQL_SERVER_PASSWORD'),
           database: configService.get('MYSQL_SERVER_DATABASE'),
-          entities: [User, Role, Permission, MeetingRoom],
+          entities: [User, Role, Permission, MeetingRoom, Booking],
           synchronize: true,
-          logging: true,
+          // logging: true,
           poolSize: 10,
           connectorPackage: 'mysql2',
           extra: {
@@ -62,6 +64,7 @@ import { MeetingRoom } from './meeting-room/entities/meeting-room.entity';
       inject: [ConfigService],
     }),
     MeetingRoomModule,
+    BookingModule,
   ],
   controllers: [AppController],
   providers: [
@@ -81,6 +84,10 @@ import { MeetingRoom } from './meeting-room/entities/meeting-room.entity';
     {
       provide: APP_INTERCEPTOR,
       useClass: InvokeRecordInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ClassSerializerInterceptor,
     },
     {
       provide: APP_PIPE,
